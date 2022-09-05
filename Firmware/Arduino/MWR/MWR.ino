@@ -11,16 +11,16 @@
 #include "mwr_config.h";
 
 // Pin Definitions
-#define I2S_DOUT 27
-#define I2S_BCLK 26
-#define I2S_LRC  25
-#define I2S_GAIN 14
-#define I2S_SD 12
+#define I2S_DOUT 25
+#define I2S_BCLK 27
+#define I2S_LRC  26
+#define I2S_GAIN 12
+#define I2S_SD 13
 #define LED_BATT 5
 #define LED_WIFI 18
 #define VOL 34
-#define MODE_0 13
-#define MODE_1 15
+#define MODE_0 23
+#define MODE_1 22
 int VBATT = 33;
 
 // Initalise Libaries
@@ -57,7 +57,7 @@ void setup() {
     // Start into Radio mode
     mConfig.stMode();
     while (WiFi.status() != WL_CONNECTED){flashLED(LED_WIFI,150);delay(500);}
-    WiFi.onEvent(WiFiStationDisconnected, SYSTEM_EVENT_STA_DISCONNECTED);
+    WiFi.onEvent(WiFiStationDisconnected, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
     // Initalise Audio
     mRadio.init(I2S_DOUT, I2S_BCLK, I2S_LRC, I2S_GAIN, I2S_SD);
     // Get and Set Station URL
@@ -109,8 +109,8 @@ void CheckBattery( void * _VBATT) {
               flashLED(LED_BATT,50);      // Danger
               Serial.println("Battery low, going to sleep");
               delay(1000);
-              Serial.flush(); 
-              esp_deep_sleep_start();
+              //Serial.flush(); 
+              //esp_deep_sleep_start();
             }
           }
         }
@@ -136,7 +136,7 @@ void flashLED(int LED, int SPEED)
 void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info){
   Serial.println("Disconnected from WiFi access point");
   Serial.print("WiFi lost connection. Reason: ");
-  Serial.println(info.disconnected.reason);
+  //Serial.println(info.disconnected.reason);
   Serial.println("Trying to Reconnect");
   WiFi.reconnect();
 }
