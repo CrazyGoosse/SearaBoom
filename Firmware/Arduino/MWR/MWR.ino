@@ -16,7 +16,6 @@
 #define I2S_LRC  26
 #define I2S_GAIN 12
 #define I2S_SD 13
-#define LED_BATT 5
 #define LED_WIFI 18
 #define VOL 34
 #define MODE_0 23
@@ -27,15 +26,11 @@ int VBATT = 33;
 MWConfig mConfig;
 MWRadio mRadio;
 
-// Initialise Battery Task
-TaskHandle_t ChckBatTsk;
-
 int mode = 0;   // Mode State
 
 void setup() {
   // Start Serial for debugging
   Serial.begin(115200);
-  pinMode(LED_BATT,OUTPUT);
   pinMode(LED_WIFI,OUTPUT);
 
   // Start SPIFFS
@@ -43,9 +38,6 @@ void setup() {
     Serial.println("An error has occurred while mounting SPIFFS");
   }
   Serial.println("SPIFFS mounted successfully");
-
-  // Create Battery Task
-  xTaskCreatePinnedToCore(CheckBattery,"ChckBatTsk",10000,(void*)&VBATT,0,&ChckBatTsk,NULL);
 
   // Detect operating mode
   mode = mConfig.detectMode(MODE_0,MODE_1);
@@ -84,43 +76,7 @@ void loop() {
 // Get volume state, mapped 1-20
 int getVolume()
 {
-  return map(analogRead(VOL), 0, 4095, 1, 20);
-}
-
-// Check Battery Level
-void CheckBattery( void * _VBATT) {
-  float voltage = 0;
-  int timer = 200;
-  for(;;) {
-    if(timer >= 200){ voltage = ((float)analogRead(*((int*)_VBATT)) / 4095) * 3.3 * 2 * 1.035; timer = 0; }
-      if(voltage > 4) {
-        digitalWrite(LED_BATT,HIGH); delay(100); digitalWrite(LED_BATT,LOW); delay(100);
-        digitalWrite(LED_BATT,HIGH); delay(300); digitalWrite(LED_BATT,LOW); delay(100);
-      }else{
-        if(voltage > 3.7){
-          digitalWrite(LED_BATT,HIGH);    // Normal Range
-          delay(1000);
-        }else{
-          if(voltage > 3.5){              // Lower End
-            flashLED(LED_BATT,500);
-          }else{                   
-            flashLED(LED_BATT,150);       // Low
-            if(voltage <= 3.1){
-              flashLED(LED_BATT,50);      // Danger
-              Serial.println("Battery low, going to sleep");
-              delay(1000);
-              //Serial.flush(); 
-              //esp_deep_sleep_start();
-            }
-          }
-        }
-      }
-    timer++;
-    Serial.print("Battery:");
-    Serial.println(voltage);
-    Serial.print("RSSI:");
-    Serial.println(WiFi.RSSI());
-  }
+  return 22;
 }
 
 // Flash an LED
