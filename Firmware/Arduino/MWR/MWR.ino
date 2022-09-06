@@ -17,10 +17,14 @@
 #define I2S_GAIN 12
 #define I2S_SD 13
 #define LED_WIFI 18
-#define VOL 34
 #define MODE_0 23
 #define MODE_1 22
-int VBATT = 33;
+int VOL = 15; // Default volume 0-22
+
+// Touch input parameters
+int threshold = 40;
+bool touch1detected = false;
+bool touch2detected = false;
 
 // Initalise Libaries
 MWConfig mConfig;
@@ -33,6 +37,10 @@ void setup() {
   Serial.begin(115200);
   pinMode(LED_WIFI,OUTPUT);
 
+  // Initialize touch interupts
+  touchAttachInterrupt(T2, gotTouch1, threshold);
+  touchAttachInterrupt(T3, gotTouch2, threshold);
+  
   // Start SPIFFS
   if (!SPIFFS.begin(true)) {
     Serial.println("An error has occurred while mounting SPIFFS");
@@ -60,23 +68,36 @@ void setup() {
 
 void loop() {
   if(mode){
-    /** 
-     *  V1 Hardware only
-     *  ----------------------
-     *  As battery is on mechanical switch we treat minimum volume
-     *  as effectly a "charge only" mode
-     */
-    if(getVolume() >1){
      mRadio.setVolume(getVolume());
      mRadio.play();
-    }
   }
 }
 
 // Get volume state, mapped 1-20
 int getVolume()
 {
-  return 22;
+   if(touch1detected){
+    touch1detected = false;
+    if (VOL < 23){
+      VOL++;
+    }
+  }
+  if(touch2detected){
+    touch2detected = false;
+     if (VOL > 0){
+      VOL--;
+    }
+  }
+  return VOL;
+}
+
+// Handle touch inputs for volume
+void gotTouch1(){
+ touch1detected = true;
+}
+
+void gotTouch2(){
+ touch2detected = true;
 }
 
 // Flash an LED
