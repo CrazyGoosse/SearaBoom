@@ -221,7 +221,7 @@ void setup() {
     touchAttachInterrupt(TOUCHDOWN, VolumeDown, TOUCHTHRESS); 
     touchAttachInterrupt(TOUCHUP, VolumeUp, TOUCHTHRESS);       // Init touch interrupts
     Serial.println("Connecting to stream");
-    if (url = "URL1"){
+    if (url == "URL1"){
         audio.connecttohost(URL1);    // Radio Seara 1027 AAC Stream
     } else {
         audio.connecttohost(URL2);    // Radio Seara 1047 AAC Stream
@@ -257,3 +257,4 @@ void loop() {
         }
     }
 }
+
